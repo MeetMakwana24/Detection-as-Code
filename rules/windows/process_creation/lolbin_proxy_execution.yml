@@ -1,0 +1,34 @@
+title: Suspicious LOLBin Proxy Execution
+id: 2c6f4a91-8d3b-4e75-9a10-5b7d2c8e6f44
+status: test
+description: Detects common signed Windows binaries used to proxy execution of scripts, DLLs, or remote payloads.
+references:
+    - https://attack.mitre.org/techniques/T1218/
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.defense_evasion
+    - attack.t1218
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_mshta:
+        Image|endswith: '\mshta.exe'
+    selection_regsvr32:
+        Image|endswith: '\regsvr32.exe'
+        CommandLine|contains:
+            - '/i:http'
+            - 'scrobj.dll'
+    selection_rundll32:
+        Image|endswith: '\rundll32.exe'
+        CommandLine|contains:
+            - 'javascript:'
+            - 'url.dll,FileProtocolHandler'
+    selection_installutil:
+        Image|endswith: '\installutil.exe'
+    condition: selection_mshta or selection_regsvr32 or selection_rundll32 or selection_installutil
+falsepositives:
+    - Legacy applications that use mshta or rundll32
+    - Signed software installers using InstallUtil
+level: high

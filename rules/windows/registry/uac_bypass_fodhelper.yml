@@ -1,0 +1,28 @@
+title: UAC Bypass Registry Hijack via Fodhelper
+id: 5a1e7c93-2d64-4f80-b9a6-8c3e1d5f7b48
+status: test
+description: Detects registry changes used to hijack the ms-settings handler and bypass UAC through fodhelper.exe.
+references:
+    - https://attack.mitre.org/techniques/T1548/002/
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.privilege_escalation
+    - attack.defense_evasion
+    - attack.t1548.002
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_key:
+        TargetObject|contains: '\Software\Classes\ms-settings\Shell\Open\command'
+    selection_value:
+        Details|contains:
+            - 'DelegateExecute'
+            - 'cmd.exe'
+            - 'powershell.exe'
+            - 'rundll32.exe'
+    condition: selection_key and selection_value
+falsepositives:
+    - Legitimate developer testing of protocol handlers
+level: high

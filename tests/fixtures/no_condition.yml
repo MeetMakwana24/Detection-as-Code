@@ -1,0 +1,14 @@
+# Sigma rule with detection missing the condition key (synthetic fixture)
+title: Rule Without Condition
+id: 00000000-0000-4000-a000-000000000097
+status: test
+description: This rule has a detection block but no condition key.
+author: Test Author
+date: 2026/01/01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+level: low

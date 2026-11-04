@@ -1,0 +1,15 @@
+# Sigma rule with same ID as valid_rule.yml to test duplicate detection (synthetic fixture)
+title: Duplicate ID Rule
+id: 00000000-0000-4000-a000-000000000001
+status: test
+description: This rule deliberately reuses the ID from valid_rule.yml.
+author: Test Author
+date: 2026/01/01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection
+level: medium

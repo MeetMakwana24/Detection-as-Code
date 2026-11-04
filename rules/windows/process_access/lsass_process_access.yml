@@ -1,0 +1,34 @@
+title: Suspicious Process Access to LSASS
+id: 3b9d6e24-7c15-4a80-9f2b-5e8c1d7a4f65
+status: test
+description: Detects Sysmon process-access events targeting LSASS with access rights commonly associated with credential dumping.
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+    - https://learn.microsoft.com/sysinternals/downloads/sysmon
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.credential_access
+    - attack.t1003.001
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_target:
+        EventID: 10
+        TargetImage|endswith: '\lsass.exe'
+    selection_access:
+        GrantedAccess:
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+            - '0x1fffff'
+    filter_known_system:
+        SourceImage|endswith:
+            - '\csrss.exe'
+            - '\wininit.exe'
+    condition: selection_target and selection_access and not filter_known_system
+falsepositives:
+    - EDR, antivirus, and endpoint-monitoring products
+    - Authorized memory-analysis tools
+level: critical

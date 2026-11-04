@@ -1,0 +1,15 @@
+# Sigma rule with an invalid status value (synthetic fixture)
+title: Rule With Invalid Status
+id: 00000000-0000-4000-a000-000000000098
+status: production
+description: This rule has an invalid status value for testing.
+author: Test Author
+date: 2026/01/01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection
+level: low

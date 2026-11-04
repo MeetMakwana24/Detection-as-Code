@@ -1,0 +1,38 @@
+title: Office Application Spawning Suspicious Child Process
+id: 9e3a1c76-5b42-4d8f-8c90-2f6b7e1a4d33
+status: test
+description: Detects Office applications spawning command shells, script engines, or common proxy-execution binaries.
+references:
+    - https://attack.mitre.org/techniques/T1204/002/
+    - https://attack.mitre.org/techniques/T1059/
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.execution
+    - attack.t1204.002
+    - attack.t1059
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_office_parent:
+        ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\outlook.exe'
+    selection_suspicious_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+    condition: selection_office_parent and selection_suspicious_child
+falsepositives:
+    - Trusted Office add-ins or document automation
+    - Approved reporting macros
+level: high

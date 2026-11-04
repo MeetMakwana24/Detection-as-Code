@@ -1,0 +1,15 @@
+# Toolchain prerequisites (install before this file):
+# - Python 3.11 (the version used by CI; Python 3.10+ is supported)
+# - Git 2.40+
+# Git and Python are system tools, so pip cannot install or constrain them here.
+# Keep pip current enough for modern package metadata and dependency resolution.
+pip>=23.3,<26
+
+# Sigma rule processing
+pySigma>=0.11.0
+pySigma-backend-splunk>=1.0.0
+pySigma-pipeline-sysmon>=1.0.0
+pySigma-pipeline-windows>=1.0.0
+
+# YAML handling
+PyYAML>=6.0

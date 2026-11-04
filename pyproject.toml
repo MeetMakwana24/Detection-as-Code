@@ -1,0 +1,16 @@
+[project]
+name = "detection-as-code"
+version = "1.0.0"
+description = "Detection-as-Code pipeline: Sigma rules validated, tested, and converted to Splunk SPL via CI/CD."
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+markers = [
+    "conversion: tests requiring pySigma-backend-splunk (may be skipped if not installed)",
+]
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = ["tests/*"]

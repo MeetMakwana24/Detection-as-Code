@@ -1,0 +1,33 @@
+title: Windows Defender Tampering via PowerShell
+id: 4a8f9c21-6e3b-4d75-a2c8-1f0e9b7d3a61
+status: test
+description: Detects PowerShell commands that weaken Microsoft Defender protections or add antivirus exclusions.
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.defense_evasion
+    - attack.t1562.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_tamper:
+        CommandLine|contains:
+            - 'Set-MpPreference'
+            - 'Add-MpPreference'
+            - 'DisableRealtimeMonitoring'
+            - 'DisableBehaviorMonitoring'
+            - 'DisableIOAVProtection'
+            - 'ExclusionPath'
+            - 'ExclusionProcess'
+    condition: selection_process and selection_tamper
+falsepositives:
+    - Authorized endpoint-security administration
+    - Endpoint-management scripts that configure Defender exclusions
+level: high

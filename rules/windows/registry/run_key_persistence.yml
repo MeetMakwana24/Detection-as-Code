@@ -1,0 +1,41 @@
+title: Suspicious Registry Run Key Persistence
+id: a2b4c6d8-e0f1-4a3b-8c5d-7e9f1a3b5c03
+status: test
+description: |
+    Detects modification of Windows Registry Run and RunOnce keys which are commonly
+    abused by malware and attackers to achieve persistence. Programs listed in these
+    keys execute automatically when a user logs on. Requires Sysmon Event ID 13
+    (Registry Value Set) or equivalent registry auditing.
+references:
+    - https://attack.mitre.org/techniques/T1547/001/
+    - https://docs.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys
+author: Meet Makwana
+date: 2026/10/13
+tags:
+    - attack.persistence
+    - attack.t1547.001
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_keys:
+        TargetObject|contains:
+            - '\CurrentVersion\Run\'
+            - '\CurrentVersion\RunOnce\'
+            - '\CurrentVersion\RunServices\'
+            - '\CurrentVersion\RunServicesOnce\'
+            - '\CurrentVersion\Explorer\Shell Folders'
+            - '\CurrentVersion\Explorer\User Shell Folders'
+    filter_legitimate:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\explorer.exe'
+        Details|contains:
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+    condition: selection_keys and not filter_legitimate
+falsepositives:
+    - Legitimate software installations that add Run key entries
+    - System administration tools that configure auto-start programs
+    - Group Policy updates that modify registry startup entries
+level: medium

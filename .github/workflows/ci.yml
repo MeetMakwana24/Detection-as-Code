@@ -1,0 +1,59 @@
+name: Detection-as-Code CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'rules/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'requirements*.txt'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-test:
+    name: Validate Rules & Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Validate Sigma rules (structural checks)
+        run: python scripts/validate_rules.py
+
+      - name: Run test suite
+        run: pytest tests/ -v --tb=short --junitxml=test-results.xml
+
+      - name: Convert rules to Splunk SPL
+        run: python scripts/convert_rules.py --output-dir output/splunk/
+
+      - name: Upload converted SPL queries
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: splunk-queries
+          path: output/splunk/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
+          retention-days: 30

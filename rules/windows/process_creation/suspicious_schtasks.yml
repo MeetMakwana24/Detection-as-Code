@@ -1,0 +1,40 @@
+title: Suspicious Scheduled Task Creation via Schtasks
+id: e1f3a5b7-c9d0-4e2f-a4b6-8c0d2e4f6a05
+status: test
+description: |
+    Detects creation of scheduled tasks using schtasks.exe with suspicious patterns
+    such as tasks running from temporary directories, user profile paths, or AppData.
+    Attackers use scheduled tasks for persistence and lateral movement. Legitimate
+    scheduled tasks typically reference paths under Program Files or Windows directories.
+references:
+    - https://attack.mitre.org/techniques/T1053/005/
+    - https://docs.microsoft.com/en-us/windows/win32/taskschd/schtasks
+author: Meet Makwana
+date: 2026/10/13
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.t1053.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_schtasks:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    selection_suspicious_paths:
+        CommandLine|contains:
+            - '\AppData\'
+            - '\Temp\'
+            - '\tmp\'
+            - '\ProgramData\'
+            - '\Users\Public\'
+            - '%APPDATA%'
+            - '%TEMP%'
+            - '%TMP%'
+    condition: selection_schtasks and selection_suspicious_paths
+falsepositives:
+    - Legitimate application updaters that schedule tasks from AppData
+    - Administrative scripts that create scheduled maintenance tasks
+    - Software installation routines that register cleanup tasks
+level: high

@@ -1,0 +1,5 @@
+# Deliberately malformed YAML for testing (synthetic fixture)
+title: This rule has broken YAML
+id: not-closed-bracket
+  bad indent: [unclosed
+description unterminated

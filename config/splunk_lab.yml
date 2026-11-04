@@ -1,0 +1,32 @@
+# Splunk Home SOC Lab Configuration
+#
+# Adjust these values to match your lab environment.
+# The convert_rules.py script uses the pySigma Splunk pipeline by default,
+# which maps Sigma fields to Splunk CIM-compatible field names.
+#
+# If you use Splunk Add-on for Windows (TA-windows), the default pipeline
+# should work.  If your field names differ, you can create a custom
+# pySigma ProcessingPipeline — see the pySigma documentation.
+
+splunk:
+  # Default index for converted queries (used if you customize the pipeline)
+  default_index: main
+
+  # Index mapping per log source
+  indices:
+    windows_security: wineventlog
+    windows_sysmon: sysmon
+    windows_system: wineventlog
+
+  # Sourcetype mapping
+  sourcetypes:
+    windows_security: "WinEventLog:Security"
+    windows_sysmon: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    windows_system: "WinEventLog:System"
+
+  # Set to true if Sysmon is deployed in your lab.
+  # This affects which processing pipeline is used during conversion.
+  sysmon_deployed: true
+
+  # Splunk management URL (for documentation reference only — not used by scripts)
+  url: "https://localhost:8089"

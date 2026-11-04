@@ -1,0 +1,20 @@
+# Minimal valid Sigma rule for testing purposes (synthetic fixture)
+title: Test Rule - Valid Sigma Detection
+id: 00000000-0000-4000-a000-000000000001
+status: test
+description: A minimal valid Sigma rule used as a test fixture.
+author: Test Author
+date: 2026/01/01
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\cmd.exe'
+    condition: selection
+falsepositives:
+    - Legitimate command-line usage
+level: low

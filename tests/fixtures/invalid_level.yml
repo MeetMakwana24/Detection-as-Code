@@ -1,0 +1,15 @@
+# Sigma rule with an invalid severity level (synthetic fixture)
+title: Rule With Invalid Level
+id: 00000000-0000-4000-a000-000000000099
+status: test
+description: This rule has an invalid level value for testing.
+author: Test Author
+date: 2026/01/01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection
+level: extreme

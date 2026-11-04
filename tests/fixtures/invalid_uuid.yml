@@ -1,0 +1,15 @@
+# Sigma rule with a malformed UUID (synthetic fixture)
+title: Rule With Bad UUID
+id: not-a-valid-uuid-at-all
+status: test
+description: This rule has a malformed UUID for testing.
+author: Test Author
+date: 2026/01/01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection
+level: low

@@ -1,0 +1,11 @@
+# Sigma rule missing several required fields (synthetic fixture)
+# Missing: id, status, author, date, level
+title: Incomplete Rule
+description: This rule is intentionally missing required fields.
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\test.exe'
+    condition: selection

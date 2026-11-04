@@ -1,0 +1,26 @@
+title: Windows RDP Logon Success
+id: 1f7c3a58-9d2e-4b60-8a4f-6e1c5d9b2a73
+status: test
+description: Detects successful Remote Desktop logons. Investigate logons from unusual source hosts, accounts, or times.
+references:
+    - https://attack.mitre.org/techniques/T1021/001/
+    - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.lateral_movement
+    - attack.t1021.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 10
+    filter_machine_accounts:
+        TargetUserName|endswith: '$'
+    condition: selection and not filter_machine_accounts
+falsepositives:
+    - Authorized helpdesk or administrator RDP sessions
+    - Jump-host and virtual-desktop infrastructure activity
+level: medium

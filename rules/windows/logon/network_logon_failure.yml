@@ -1,0 +1,38 @@
+title: Windows Network Logon Failure
+id: d8e0f2a4-b6c8-4d1e-9f3a-5b7c9d2e4f04
+status: test
+description: |
+    Detects failed network logon attempts (Event ID 4625) with logon types 3 (Network)
+    and 10 (RemoteInteractive / RDP). Individual events may be benign, but a high
+    volume from a single source indicates password spraying or brute-force attacks.
+    Configure a threshold-based Splunk alert (e.g., >5 events in 5 minutes per source)
+    to reduce noise in production.
+references:
+    - https://attack.mitre.org/techniques/T1110/001/
+    - https://attack.mitre.org/techniques/T1110/003/
+    - https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
+author: Meet Makwana
+date: 2026/10/13
+tags:
+    - attack.credential_access
+    - attack.t1110.001
+    - attack.t1110.003
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4625
+    selection_logon_type:
+        LogonType:
+            - 3
+            - 10
+    filter_machine_accounts:
+        TargetUserName|endswith: '$'
+    condition: selection and selection_logon_type and not filter_machine_accounts
+falsepositives:
+    - Misconfigured service accounts with expired or wrong passwords
+    - Users who mistype their password once or twice
+    - Network scanners or monitoring tools that probe authentication
+    - Automated scripts using stale credentials
+level: medium

@@ -1,0 +1,31 @@
+title: Suspicious Windows Service Installation
+id: 8c4e2f71-6a90-4d3b-b5c8-0f1a7e9d4c26
+status: test
+description: Detects services installed with executable paths in user-writable or temporary directories, a common persistence and lateral-movement technique.
+references:
+    - https://attack.mitre.org/techniques/T1543/003/
+    - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-7045
+author: Meet Makwana
+date: 2026/10/30
+tags:
+    - attack.persistence
+    - attack.privilege_escalation
+    - attack.t1543.003
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_service_install:
+        EventID: 7045
+    selection_suspicious_path:
+        ServiceFileName|contains:
+            - '\AppData\'
+            - '\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - '\Downloads\'
+    condition: selection_service_install and selection_suspicious_path
+falsepositives:
+    - Approved software installers that register an updater service
+    - Enterprise tools installed outside Program Files
+level: high
