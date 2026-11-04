@@ -2,14 +2,28 @@
 
 A Detection-as-Code pipeline for managing Sigma detection rules, validating them with CI/CD, and converting them to Splunk SPL queries for a Home SOC Lab.
 
+Current package version: `1.0.0` (see `pyproject.toml`).
+
+## Requirements
+
+| Tool | Recommended version | Notes |
+|---|---|---|
+| Python | 3.11 | Python 3.10+ is supported; CI runs on Python 3.11. |
+| pip | 23.3 to <26 | Upgraded during setup for reliable dependency resolution. |
+| Git | 2.40+ | Required to clone and publish the repository. |
+
+Python and Git are installed separately from the project. The supported pip version is installed from `requirements.txt`.
+
 ## Overview
 
 ```
 rules/              ← Sigma YAML detection rules
   windows/
-    process_creation/   powershell, lsass, schtasks
-    registry/           run key persistence
-    logon/              network logon failures
+    logon/              network logon failures, RDP logon success
+    process_access/     LSASS process access
+    process_creation/   PowerShell, LSASS, schtasks, LOLBins, WMI, Office, and Defender
+    registry/           Run key persistence, Fodhelper UAC bypass
+    system/             suspicious service installation
 scripts/
   validate_rules.py ← Structural validation (YAML, fields, IDs, ATT&CK tags)
   convert_rules.py  ← Sigma → Splunk SPL via pySigma
@@ -34,10 +48,25 @@ cd Detection-as-Code
 python --version                 # recommended: Python 3.11
 git --version                    # required: Git 2.40+
 python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate   # Linux/macOS
+```
+
+Activate the environment:
+
+```powershell
+# Windows PowerShell
+.\venv\Scripts\Activate.ps1
+```
+
+```bash
+# Linux/macOS
+source venv/bin/activate
+```
+
+Install the dependencies:
+
+```bash
 python -m pip install --upgrade "pip>=23.3,<26"
-pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt
 ```
 
 ### 2. Validate rules
@@ -100,6 +129,21 @@ See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions and [docs/TES
 - **Threshold-based detections** — The network logon failure rule detects individual events; configure alert thresholds in your Splunk saved searches for brute-force detection.
 - **Registry rules require Sysmon** — The Run key persistence rule requires Sysmon Event ID 13 or equivalent registry auditing.
 - **Field mappings** — If your Splunk environment does not use TA-windows CIM field names, you may need a custom processing pipeline.
+
+## Publishing an Update to GitHub
+
+Before publishing a new release, update the package version in `pyproject.toml`, run the validation and tests, then commit and tag the release:
+
+```bash
+python scripts/validate_rules.py
+pytest tests/ -v
+git add README.md requirements.txt requirements-dev.txt pyproject.toml
+git commit -m "Release vX.Y.Z"
+git tag vX.Y.Z
+git push origin main --tags
+```
+
+Replace `X.Y.Z` with the version set in `pyproject.toml`. GitHub Actions will validate, test, and generate the Splunk SPL artifact for the pushed commit or tag.
 
 ## License
 
