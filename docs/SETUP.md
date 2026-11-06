@@ -4,7 +4,7 @@
 
 | Requirement | Minimum Version | Purpose |
 |-------------|----------------|---------|
-| Python      | 3.11 (recommended; 3.10+ supported) | Validation scripts, pySigma |
+| Python      | 3.11+          | Validation scripts, pySigma |
 | pip         | 23.3+          | Dependency management |
 | Git         | 2.40+          | Version control |
 | Splunk Free/Dev | 9.x+       | Home SOC Lab (optional for local testing) |

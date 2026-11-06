@@ -1,8 +1,8 @@
-"""Tests for the Sigma-to-Splunk SPL conversion (scripts/convert_rules.py).
+"""Tests for vendor query conversion (scripts/convert_rules.py).
 
 These tests verify that:
   1. The pySigma backend can parse each Sigma rule without exceptions.
-  2. The resulting SPL query strings are non-empty.
+  2. The resulting vendor query strings are non-empty.
   3. Key detection terms survive the conversion (sanity check).
 
 IMPORTANT — All tests here are *synthetic*:
@@ -24,7 +24,7 @@ SigmaRule = pytest.importorskip(
     "sigma.rule", reason="pySigma not installed"
 ).SigmaRule
 
-from convert_rules import convert_rule_file, _build_backend
+from convert_rules import build_backend, convert_rule_file, _build_backend
 
 
 RULES_DIR = Path(__file__).resolve().parent.parent / "rules"
@@ -96,3 +96,31 @@ class TestConversion:
             assert result["title"], f"Missing title in {rule_file.name}"
             assert result["id"] != "unknown", f"Missing id in {rule_file.name}"
             assert isinstance(result["queries"], list)
+
+
+@pytest.mark.parametrize(
+    ("target", "backend_module"),
+    [
+        ("elasticsearch", "sigma.backends.elasticsearch"),
+        ("sentinel", "sigma.backends.kusto"),
+    ],
+)
+def test_additional_vendor_targets_convert_all_rules(
+    all_rule_files, target, backend_module
+):
+    """Each enabled vendor backend converts every production rule."""
+    pytest.importorskip(backend_module)
+    backend = build_backend(target)
+    failures = []
+
+    for rule_file in all_rule_files:
+        try:
+            result = convert_rule_file(rule_file, backend, target)
+            assert result["queries"], f"Empty {target} output for {rule_file.name}"
+        except Exception as exc:
+            failures.append(f"{rule_file.name}: {exc}")
+
+    if failures:
+        raise AssertionError(
+            f"{target} conversion failures:\n" + "\n".join(failures)
+        )

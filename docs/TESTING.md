@@ -27,9 +27,9 @@ pytest tests/ -v --cov=scripts --cov-report=term-missing
 
 All fixture data in `tests/fixtures/` is synthetic — purpose-built YAML files designed to exercise specific validation paths.  No production data or credentials are used.
 
-### 2. Manual Splunk Validation (Lab)
+### 2. Manual SIEM Validation (Lab)
 
-Automated tests confirm structural correctness but **cannot** verify that a query returns the expected results against real Windows event logs.  Manual validation in your Splunk Home SOC Lab is required.
+Automated tests confirm structural correctness but **cannot** verify that a query returns the expected results against real Windows event logs. Manual validation in each target SIEM is required.
 
 #### Recommended Manual Test Procedure
 

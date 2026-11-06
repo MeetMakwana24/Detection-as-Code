@@ -1,6 +1,18 @@
 # Detection-as-Code
 
-A Detection-as-Code pipeline for managing Sigma detection rules, validating them with CI/CD, and converting them to Splunk SPL queries for a Home SOC Lab.
+A Detection-as-Code pipeline for managing Sigma detection rules, validating them with CI/CD, and converting them to Splunk SPL, Elasticsearch Lucene, and Microsoft Sentinel KQL queries.
+
+Current package version: `1.0.0` (see `pyproject.toml`).
+
+## Requirements
+
+| Tool | Recommended version | Notes |
+|---|---|---|
+| Python | 3.11 | Python 3.11+ is required; CI runs on Python 3.11. |
+| pip | 23.3 to <26 | Upgraded during setup for reliable dependency resolution. |
+| Git | 2.40+ | Required to clone and publish the repository. |
+
+Python and Git are installed separately from the project. The supported pip version is installed from `requirements.txt`.
 
 Current package version: `1.0.0` (see `pyproject.toml`).
 
@@ -26,7 +38,7 @@ rules/              ← Sigma YAML detection rules
     system/             suspicious service installation
 scripts/
   validate_rules.py ← Structural validation (YAML, fields, IDs, ATT&CK tags)
-  convert_rules.py  ← Sigma → Splunk SPL via pySigma
+  convert_rules.py  ← Sigma → Splunk, Elasticsearch, and Sentinel queries via pySigma
 tests/
   fixtures/         ← Synthetic YAML fixtures (valid + deliberately broken)
   test_validator.py ← Validator unit tests
@@ -43,7 +55,7 @@ docs/               ← Setup, testing, and false-positive guides
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/<you>/Detection-as-Code.git
+git clone https://github.com/MeetMakwana24/Detection-as-Code.git
 cd Detection-as-Code
 python --version                 # recommended: Python 3.11
 git --version                    # required: Git 2.40+
@@ -81,12 +93,24 @@ python scripts/validate_rules.py
 pytest tests/ -v
 ```
 
-### 4. Convert rules to Splunk SPL
+### 4. Convert rules to vendor queries
 
 ```bash
 python scripts/convert_rules.py
 python scripts/convert_rules.py --output-dir output/splunk/   # write to files
 ```
+
+## Multi-vendor Conversion
+
+The converter defaults to Splunk for backward compatibility. Select a target with --target:
+
+    python scripts/convert_rules.py --target elasticsearch --output-dir output/elasticsearch/
+    python scripts/convert_rules.py --target sentinel --output-dir output/sentinel/
+    python scripts/convert_rules.py --target all --output-dir output/
+
+Elasticsearch output is Lucene syntax mapped to Elastic Common Schema (ECS) Windows fields. Sentinel output is Kusto Query Language (KQL) mapped through Microsoft Sentinel ASIM. Confirm the generated fields and tables against the connectors deployed in your environment before enabling alerts.
+
+The converter supports both current and older optional pySigma pipeline packages. If a pipeline is absent, conversion continues with the available backend mappings.
 
 ## Detection Rules
 

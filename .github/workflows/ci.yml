@@ -39,15 +39,15 @@ jobs:
       - name: Run test suite
         run: pytest tests/ -v --tb=short --junitxml=test-results.xml
 
-      - name: Convert rules to Splunk SPL
-        run: python scripts/convert_rules.py --output-dir output/splunk/
+      - name: Convert rules to vendor queries
+        run: python scripts/convert_rules.py --target all --output-dir output/
 
       - name: Upload converted SPL queries
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: splunk-queries
-          path: output/splunk/
+          name: vendor-queries
+          path: output/
           retention-days: 30
 
       - name: Upload test results
