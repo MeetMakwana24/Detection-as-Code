@@ -139,21 +139,6 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on p
 2. **Test** — `pytest tests/` runs the full test suite (validator + conversion).
 3. **Convert** — `python scripts/convert_rules.py` produces Splunk SPL and uploads the output as a CI artifact.
 
-## Splunk Home SOC Lab Integration
-
-Edit `config/splunk_lab.yml` to match your lab's indices and sourcetypes.  The conversion script uses the pySigma `splunk_windows_pipeline` which produces CIM-compatible field names suitable for environments using the Splunk Add-on for Windows (TA-windows).
-
-After conversion, paste the generated SPL queries into Splunk Web → **Search & Reporting** to test them against your collected Windows event logs.
-
-See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions and [docs/TESTING.md](docs/TESTING.md) for guidance on validating detections in your lab.
-
-## Limitations
-
-- **Synthetic tests only** — The automated test suite validates rule structure and conversion logic.  It does not execute queries against a live Splunk instance.
-- **Threshold-based detections** — The network logon failure rule detects individual events; configure alert thresholds in your Splunk saved searches for brute-force detection.
-- **Registry rules require Sysmon** — The Run key persistence rule requires Sysmon Event ID 13 or equivalent registry auditing.
-- **Field mappings** — If your Splunk environment does not use TA-windows CIM field names, you may need a custom processing pipeline.
-
 ## Publishing an Update to GitHub
 
 Before publishing a new release, update the package version in `pyproject.toml`, run the validation and tests, then commit and tag the release:
@@ -168,7 +153,5 @@ git push origin main --tags
 ```
 
 Replace `X.Y.Z` with the version set in `pyproject.toml`. GitHub Actions will validate, test, and generate the Splunk SPL artifact for the pushed commit or tag.
-
-## License
 
 This project is provided for educational and home lab use.
